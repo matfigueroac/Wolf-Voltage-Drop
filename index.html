@@ -9,7 +9,7 @@
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background-color: #f5f5f5;
+      background-color: #eef1f5;
       margin: 0;
       color: #333;
     }
@@ -41,22 +41,8 @@
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
-    button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border: none;
-      background-color: #c0392b;
-      color: white;
-      font-size: 16px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #a93226;
-    }
     .result {
-      background-color: #e74c3c;
+      background-color: #c0392b;
       color: white;
       padding: 15px;
       margin-top: 20px;
@@ -97,42 +83,41 @@
     <div class="column">
       <div class="input-group">
         <label for="material">Material (K):</label>
-        <select id="material">
+        <select id="material" onchange="calculateVoltageDrop()">
           <option value="12.9">Copper</option>
           <option value="21.2">Aluminum</option>
         </select>
       </div>
       <div class="input-group">
         <label for="q">Power Factor (Q):</label>
-        <input type="number" id="q" placeholder="Enter the Power Factor">
+        <input type="number" id="q" placeholder="Enter the Power Factor" oninput="calculateVoltageDrop()">
       </div>
       <div class="input-group">
         <label for="i">Current (I) in Amperes:</label>
-        <input type="number" id="i" placeholder="Enter current in amperes">
+        <input type="number" id="i" placeholder="Enter current in amperes" oninput="calculateVoltageDrop()">
       </div>
       <div class="input-group">
         <label for="d">Circuit Distance (D) in Feet:</label>
-        <input type="number" id="d" placeholder="Enter circuit distance in feet">
+        <input type="number" id="d" placeholder="Enter circuit distance in feet" oninput="calculateVoltageDrop()">
       </div>
       <div class="input-group">
         <label for="wireSize">Conductor Cross Section (CM) in Circular Mils:</label>
-        <select id="wireSize">
+        <select id="wireSize" onchange="calculateVoltageDrop()">
           <!-- Options will be populated dynamically -->
         </select>
       </div>
       <div class="input-group">
         <label for="voltage">System Voltage:</label>
-        <input type="number" id="voltage" placeholder="Enter system voltage">
+        <input type="number" id="voltage" placeholder="Enter system voltage" oninput="calculateVoltageDrop()">
       </div>
       <div class="input-group">
         <label for="phaseSelect">Phase:</label>
-        <select id="phaseSelect">
+        <select id="phaseSelect" onchange="calculateVoltageDrop()">
           <option value="single">Single</option>
           <option value="three">Three</option>
         </select>
       </div>
-      <button onclick="calculateVoltageDrop()">Calculate</button>
-      <div id="result" class="result"></div>
+      <div id="result" class="result">Voltage Drop: -- volts | Voltage Drop Percentage: --%</div>
     </div>
   </div>
   <script>
@@ -186,19 +171,24 @@
       const systemVoltage = parseFloat(document.getElementById('voltage').value);
       const phase = document.getElementById('phaseSelect').value;
 
-      let voltageDrop;
-      if (phase === 'single') {
-        voltageDrop = (2 * k * q * i * d) / cm;
-      } else {
-        voltageDrop = (1.732 * k * q * i * d) / cm;
-      }
+      let voltageDrop = phase === 'single' ? 
+        (2 * k * q * i * d) / cm : 
+        (1.732 * k * q * i * d) / cm;
 
       let voltageDropPercentage = (voltageDrop / systemVoltage) * 100;
 
-      document.getElementById('result').textContent = `Voltage Drop: ${voltageDrop.toFixed(2)} volts | Voltage Drop Percentage: ${voltageDropPercentage.toFixed(2)}%`;
+      if (!isNaN(voltageDrop) && !isNaN(voltageDropPercentage)) {
+        document.getElementById('result').textContent = `Voltage Drop: ${voltageDrop.toFixed(2)} volts | Voltage Drop Percentage: ${voltageDropPercentage.toFixed(2)}%`;
+      } else {
+        document.getElementById('result').textContent = "Please fill out all fields.";
+      }
       }
 
-      document.addEventListener('DOMContentLoaded', populateWireSizeDropdown);
+      document.addEventListener('DOMContentLoaded', () => {
+      populateWireSizeDropdown();
+      calculateVoltageDrop(); // Perform an initial calculation if default values are present
+      });
       </script>
       </body>
       </html>
+
