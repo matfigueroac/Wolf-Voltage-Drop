@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voltage Drop Calculator</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Roboto', sans-serif; background-color: #f5f5f5; margin: 0; }
+  .container { max-width: 800px; margin: 40px auto; padding: 20px; background: #fff; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px; }
+  .input-group { margin-bottom: 20px; }
+  .input-group label { display: block; font-weight: 500; margin-bottom: 5px; }
+  .input-group input, .input-group select, .input-group label.radio { width: 100%; padding: 10px; margin-top: 5px; border-radius: 4px; border: 1px solid #ddd; box-sizing: border-box; }
+  .input-group input[type='radio'] { width: auto; margin-top: 0; padding: 0; }
+  .input-group label.radio { display: inline-block; margin-right: 15px; font-weight: 400; width: auto; padding: 10px; text-align: center; }
+  button { width: 100%; padding: 15px; margin-top: 10px; border: none; background-color: #007bff; color: white; font-size: 16px; border-radius: 4px; cursor: pointer; font-weight: 500; }
+  button:hover { background-color: #005ecf; }
+  .result { background-color: #0c63e4; color: white; padding: 20px; margin-top: -20px; margin-bottom: 32px; border-radius: 0 0 8px 8px; font-size: 20px; text-align: center; }
+  .formula, .definition { background-color: #eee; padding: 15px; margin-top: 20px; border-radius: 4px; }
+  .definition ul { padding-left: 20px; margin-top: 10px; }
+  .definition ul li { margin-bottom: 10px; }
+  h1 { text-align: center; color: #333; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Voltage Drop Calculator</h1>
+   <div class="formula">
+    <p>The unity power factor section of this program is based on the approximate voltage drop formula:</p>
+    <p>For single phase: <strong>Vd = (2·K·Q·I·D) / CM</strong></p>
+    <p>For three phase: <strong>Vd = (1.732·K·Q·I·D) / CM</strong></p>
+  </div>
+
+  <div class="definition">
+    <p>where:</p>
+    <ul>
+      <li><strong>K</strong> equals 12.9 for Copper and 21.2 for Aluminum.</li>
+      <li><strong>Q</strong> is the ratio of Rac/Rdc for conductors larger than 2/0 (this takes into account skin effect at larger conductor sizes).</li>
+      <li><strong>I</strong> is the current in amperes.</li>
+      <li><strong>D</strong> is the one-way circuit distance in feet.</li>
+      <li><strong>CM</strong> is the conductor cross section in circular mils.</li>
+    </ul>
+  </div>
+
+  <div class="input-group">
+    <label for="material">Material:</label>
+    <select id="material">
+      <option value="12.9">Copper</option>
+      <option value="21.2">Aluminum</option>
+    </select>
+  </div>
+  <div class="input-group">
+    <label for="wireSize">Wire Size (AWG/kcmil):</label>
+    <select id="wireSize">
+      <!-- Wire size options will be added here by JavaScript -->
+    </select>
+  </div>
+  <div class="input-group">
+    <label for="q">Ratio of Rac/Rdc (Q):</label>
+    <input type="number" id="q" step="any">
+  </div>
+  <div class="input-group">
+    <label for="i">Current (I) in amperes:</label>
+    <input type="number" id="i" step="any">
+  </div>
+  <div class="input-group">
+    <label for="d">One-way circuit distance (D) in feet:</label>
+    <input type="number" id="d" step="any">
+  </div>
+  <div class="input-group">
+    <label for="voltage">System Voltage (V):</label>
+    <input type="number" id="voltage" step="any">
+  </div>
+  <div class="input-group">
+    <label>Phase type:</label>
+    <label class="radio">
+      <input type="radio" id="single" name="phase" value="single" checked> Single Phase
+    </label>
+    <label class="radio">
+      <input type="radio" id="three" name="phase" value="three"> Three Phase
+    </label>
+  </div>
+  <button onclick="calculateVoltageDrop()">Calculate</button>
+</div>
+ <div id="result" class="result">Results will appear here</div>
+
+<script>
+// Populate the wire size dropdown
+const wireSizes = {
+  "14 AWG": 4115,
+  "12 AWG": 6530,
+  "10 AWG": 10380,
+  "8 AWG": 16510,
+  "6 AWG": 26240,
+  "4 AWG": 41740,
+  "3 AWG": 52620,
+  "2 AWG": 66360,
+  "1 AWG": 83690,
+  "1/0 AWG": 105600,
+  "2/0 AWG": 133100,
+  "3/0 AWG": 167800,
+  "4/0 AWG": 211600,
+  "250 kcmil": 250000,
+  "300 kcmil": 300000,
+  "350 kcmil": 350000,
+  "400 kcmil": 400000,
+  "500 kcmil": 500000,
+  "600 kcmil": 600000,
+  "700 kcmil": 700000,
+  "750 kcmil": 750000,
+  "800 kcmil": 800000,
+  "900 kcmil": 900000,
+  "1000 kcmil": 1000000,
+  "1250 kcmil": 1250000,
+  "1500 kcmil": 1500000,
+  "1750 kcmil": 1750000,
+  "2000 kcmil": 2000000
+};
+
+function populateWireSizeDropdown() {
+  const wireSizeSelect = document.getElementById('wireSize');
+  Object.keys(wireSizes).forEach(size => {
+    const option = document.createElement('option');
+    option.value = wireSizes[size];
+    option.textContent = size;
+    wireSizeSelect.appendChild(option);
+  });
+}
+
+// Calculate the voltage drop and voltage drop percentage
+function calculateVoltageDrop() {
+  const k = parseFloat(document.getElementById('material').value);
+  const q = parseFloat(document.getElementById('q').value);
+  const i = parseFloat(document.getElementById('i').value);
+  const d = parseFloat(document.getElementById('d').value);
+  const cm = parseFloat(document.getElementById('wireSize').value);
+  const systemVoltage = parseFloat(document.getElementById('voltage').value);
+  const phase = document.querySelector('input[name="phase"]:checked').value;
+
+  let voltageDrop = phase === 'single'
+    ? (2 * k * q * i * d) / cm
+    : (1.732 * k * q * i * d) / cm;
+  
+  let voltageDropPercentage = (voltageDrop / systemVoltage) * 100;
+
+  // Ensure results are finite numbers before displaying
+  voltageDrop = isFinite(voltageDrop) ? voltageDrop.toFixed(2) : '---';
+  voltageDropPercentage = isFinite(voltageDropPercentage) ? voltageDropPercentage.toFixed(2) : '---';
+  
+  document.getElementById('result').innerHTML = `Voltage Drop: ${voltageDrop} volts` +
+    `<br>Voltage Drop Percentage: ${voltageDropPercentage}%`;
+}
+
+document.addEventListener('DOMContentLoaded', populateWireSizeDropdown);
+</script>
+</body>
+</html>
