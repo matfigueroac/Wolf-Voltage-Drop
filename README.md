@@ -1,4 +1,4 @@
-Use tis link:
+Use this link:
 
 https://matfigueroac.github.io/Wolf-Voltage-Drop/
 
