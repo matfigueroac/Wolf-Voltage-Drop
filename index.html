@@ -4,14 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Voltage Drop Calculator</title>
+
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Roboto', sans-serif;
       background-color: #eef1f5;
       margin: 0;
+      padding: 20px 10px; /* Adjusted padding */
       color: #333;
+    }
+    .content-container {
+      margin: 0 auto;
+      width: auto; /* Adjusted for auto width */
     }
     table {
       width: 100%;
@@ -33,52 +40,64 @@
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
-    .voltage-drop, .percentage-drop {
+    .voltage-drop, .percentage-drop, .string-voltage {
       width: 120px;
     }
-    #addRowButton, #deleteLastRowButton, #exportButton {
+    button {
       margin-left: 20px;
       padding: 5px 10px;
-      background-color: #d9534f; /* Updated to reddish color */
+      background-color: #d9534f;
       color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
-    #addRowButton:hover, #deleteLastRowButton:hover, #exportButton:hover {
-      background-color: #c9302c; /* Darker shade for hover state */
+    button:hover {
+      background-color: #c9302c;
     }
     .error {
       color: red;
       font-weight: bold;
     }
-    .content-container {
-      padding: 0 20px;
+    .section {
+      margin-bottom: 50px;
     }
+
+    .intro-section {
+      margin-left: 30px;
+      margin-right: 200px ; /* Reduced top and bottom margin, removed left and right margin */
+    }
+
   </style>
 </head>
 <body>
   <div class="content-container">
     <h1 style="text-align: center;">Voltage Drop Calculator</h1>
+
     <div class="intro-section">
       <h2>Introduction</h2>
-      <p>The voltage drop in a conductor can be calculated using the following equations:</p>
-      <p>\[Vd = (2 \cdot K \cdot Q \cdot I \cdot D) / CM\] for single phase, and</p>
-      <p>\[Vd = (1.732 \cdot K \cdot Q \cdot I \cdot D) / CM\] for three phase, where:</p>
+      <p>In photovoltaic (PV) systems, accurately calculating the voltage drop across the circuit conductors is crucial to ensure energy efficiency and system reliability. The voltage drop can significantly affect the performance of a PV system, especially in larger installations where conductors span considerable distances. This calculator aids professionals in determining the voltage drop using precise formulas tailored for single-phase and three-phase circuits:</p>
+
+      <p>\[ Vd = \frac{{2 \cdot K \cdot Q \cdot I \cdot D}}{{CM}} \] for single phase, and</p>
+      <p>\[ Vd = \frac{{1.732 \cdot K \cdot Q \cdot I \cdot D}}{{CM}} \] for three phase, where:</p>
       <ul>
-        <li>\(Vd\) = Volts Dropped: The voltage drop of the circuit conductors as expressed in volts.</li>
-        <li>\(K\) = Direct Current Constant: This is a constant that represents the direct current resistance for a one thousand circular mils conductor that is one thousand feet long, at an operating temperature of 75º C. The direct current constant value to be used for copper is 12.9 ohms and 21.2 ohms is used for aluminum conductors. The "K" constant is suitable for alternating current circuits, where the conductors do not exceed No. 1/0.</li>
-        <li>\(Q\) = Alternating Current Adjustment Factor: Alternating current circuits No. 2/0 and larger must be adjusted for the effects of self-induction (skin effect). The "Q" adjustment factor is determined by dividing alternating current resistance as listed in NEC Chapter 9, Table 9, by the direct current resistance as listed in Chapter 9, Table 8.</li>
-        <li>\(I\) = Amperes: The load in amperes at 100 percent, not 125 percent for motors or continuous loads.</li>
-        <li>\(D\) = Distance: The distance the load is located from the power supply, not the total length of the circuit conductors.</li>
-        <li>\(CM\) = Circular-Mils: The circular mils of the circuit conductor as listed in Chapter 9, Table 8.</li>
+        <li><strong>VD (Voltage Drop)</strong>: This is the voltage loss that occurs as the electric current travels through the conductor, measured in volts (V).</li>
+        <li><strong>K (Direct Current Constant)</strong>: This constant represents the resistance (in ohms) of a conductor with a cross-sectional area of 1000 circular mils and a length of 1000 feet, at a temperature of 75º C. For copper conductors, \(K = 12.9\; \Omega\), and for aluminum, \(K = 21.2\; \Omega\).</li>
+        <li><strong>Q (AC Adjustment Factor)</strong>: This factor accounts for the additional resistance due to the skin effect and proximity effect in alternating current (AC) conductors larger than 2/0 AWG. It is calculated by dividing the AC resistance from NEC Chapter 9, Table 9 by the DC resistance from Table 8.</li>
+        <li><strong>I (Current)</strong>: The current flow in the circuit, measured in amperes (A), representing the load demand at 100 percent utilization, without the additional 25% safety margin often added for motors or continuous loads.</li>
+        <li><strong>D (Distance)</strong>: The one-way distance from the power source to the load, measured in feet. It is crucial to use the one-way distance rather than the total round-trip length of the conductors.</li>
+        <li><strong>CM (Circular Mils)</strong>: A unit of area used to define the cross-sectional size of the conductor. This value is critical in determining the conductor's ability to carry current with minimal losses.</li>
       </ul>
+      <p>Understanding these parameters allows PV professionals to optimize system design, ensuring that voltage drop is within acceptable limits to maintain efficiency and prevent unnecessary power loss.</p>
     </div>
 
-    <div class="main-container">
-      <button id="deleteLastRowButton" onclick="deleteLastRow()">Delete Last Row</button>
-      <button id="addRowButton" onclick="addRow()">Add Row</button>
-      <button id="exportButton" onclick="exportTableToCSV('voltage_drop_calculations.csv')">Export to CSV</button>
+
+    <!-- AC Voltage Drop Calculator Section -->
+    <div class="section">
+      <h2>AC Voltage Drop Calculator</h2>
+      <button onclick="addACRow()">Add AC Row</button>
+      <button onclick="deleteLastRow()">Delete Last AC Row</button>
+      <button onclick="exportTableToCSV('ac_voltage_drop_calculations.csv', '#calculationTable')">Export AC to CSV</button>
       <table id="calculationTable">
         <thead>
           <tr>
@@ -95,13 +114,42 @@
           </tr>
         </thead>
         <tbody>
+          <!-- AC Rows will be added dynamically -->
+        </tbody>
+      </table>
+    </div>
 
+    <!-- DC Voltage Drop Calculator Section -->
+    <div class="section">
+      <h2>DC Voltage Drop Calculator</h2>
+      <button onclick="addDCRow()">Add DC Row</button>
+      <button onclick="deleteDCLastRow()">Delete Last DC Row</button>
+      <button onclick="exportTableToCSV('dc_voltage_drop_calculations.csv', '#dcCalculationTable')">Export DC to CSV</button>
+      <table id="dcCalculationTable">
+        <thead>
+          <tr>
+            <th>PV Array</th>
+            <th>String #</th>
+            <th>Distance (D) in Feet</th>
+            <th>Current (I) in Amperes</th>
+            <th>Module/Optimizer Voltage (V)</th>
+            <th>String Length</th>
+            <th>Wire Size</th>
+            <th>String Voltage (V)</th>
+            <th>Voltage Drop (V)</th>
+            <th>Percentage (%)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- DC Rows will be added dynamically -->
+        </tbody>
+      </table>
+    </div>
+  </div>
 
-
-  
   <script>
     const wireSizes = {
-      "14 AWG": 4115, "12 AWG": 6530, "10 AWG": 10380, "8 AWG": 16510,
+      "14 AWG": 4110, "12 AWG": 6530, "10 AWG": 10380, "8 AWG": 16510,
       "6 AWG": 26240, "4 AWG": 41740, "3 AWG": 52620, "2 AWG": 66360,
       "1 AWG": 83690, "1/0 AWG": 105600, "2/0 AWG": 133100, "3/0 AWG": 167800,
       "4/0 AWG": 211600, "250 kcmil": 250000, "300 kcmil": 300000,
@@ -112,117 +160,174 @@
       "2000 kcmil": 2000000
     };
 
-    function populateWireSizeDropdowns() {
-      document.querySelectorAll('.wireSize').forEach(select => {
-        Object.entries(wireSizes).forEach(([size, cm]) => {
-          const option = document.createElement('option');
-          option.value = cm;
-          option.textContent = size;
-          select.appendChild(option);
-        });
-      });
-    }
-
-    function calculateRow(row) {
-      const k = parseFloat(row.cells[1].getElementsByTagName('select')[0].value);
-      const q = parseFloat(row.cells[2].getElementsByTagName('input')[0].value || 1);
-      const i = parseFloat(row.cells[3].getElementsByTagName('input')[0].value || 0);
-      const d = parseFloat(row.cells[4].getElementsByTagName('input')[0].value || 0);
-      const cm = parseFloat(row.cells[5].getElementsByTagName('select')[0].value);
-      const voltage = parseFloat(row.cells[6].getElementsByTagName('input')[0].value || 0);
-      const phase = row.cells[7].getElementsByTagName('select')[0].value;
-
-      let voltageDrop = phase === 'single' ? (2 * k * q * i * d) / cm : (1.732 * k * q * i * d) / cm;
-      let voltageDropPercentage = (voltageDrop / voltage) * 100;
-
-      row.cells[8].textContent = voltageDrop.toFixed(2) + ' V';
-      row.cells[9].textContent = !isFinite(voltageDropPercentage) ? "-" : voltageDropPercentage.toFixed(2) + '%';
-    }
-
-    function validateInput(input) {
-      if (input.value < 0) {
-        input.value = 0;
-        input.classList.add('error');
-        input.setCustomValidity('Please enter a positive number.');
-      } else {
-        input.classList.remove('error');
-        input.setCustomValidity('');
+    function populateWireSizeDropdown(selectElement) {
+      for (const size in wireSizes) {
+        const option = document.createElement("option");
+        option.value = wireSizes[size];
+        option.text = size;
+        selectElement.appendChild(option);
       }
     }
 
-    function addRow() {
-      const table = document.getElementById('calculationTable').getElementsByTagName('tbody')[0];
-      const newRow = table.insertRow();
-      const cellStructure = `
+    function addACRow() {
+      const acTableBody = document.getElementById('calculationTable').querySelector('tbody');
+      const newRow = acTableBody.insertRow();
+      newRow.innerHTML = `
         <td><input type="text" placeholder="Path Name"></td>
-        <td><select onchange="calculateRow(this.parentElement.parentElement)">
-              <option value="12.9">Copper</option>
-              <option value="21.2">Aluminum</option>
-            </select></td>
-        <td><input type="number" value="1" step="any" onchange="calculateRow(this.parentElement.parentElement)" placeholder="Q"></td>
-        <td><input type="number" step="any" min="0" oninput="validateInput(this)" onchange="calculateRow(this.parentElement.parentElement)" placeholder="I"></td>
-        <td><input type="number" step="any" min="0" oninput="validateInput(this)" onchange="calculateRow(this.parentElement.parentElement)" placeholder="D"></td>
-        <td><select class="wireSize" onchange="calculateRow(this.parentElement.parentElement)"></select></td>
-        <td><input type="number" step="any" min="0" oninput="validateInput(this)" onchange="calculateRow(this.parentElement.parentElement)" placeholder="Voltage"></td>
-        <td><select onchange="calculateRow(this.parentElement.parentElement)">
-              <option value="three">Three</option>
-              <option value="single">Single</option>
-           
-            </select></td>
-        <td class="voltage-drop"></td>
-        <td class="percentage-drop"></td>
+        <td>
+          <select class="material">
+            <option value="12.9">Copper</option>
+            <option value="21.2">Aluminum</option>
+          </select>
+        </td>
+        <td><input type="number" step="any" value="1" min="0" class="powerFactor" placeholder="Q"></td>
+        <td><input type="number" step="any" min="0" class="current" placeholder="I (A)"></td>
+        <td><input type="number" step="any" min="0" class="distance" placeholder="D (ft)"></td>
+        <td><select class="wireSize"></select></td>
+        <td><input type="number" step="any" min="0" class="voltage" placeholder="System Voltage (V)"></td>
+        <td>
+          <select class="phase">
+            <option value="three">Three</option>
+            <option value="single">Single</option>
+            
+          </select>
+        </td>
+        <td class="voltage-drop">-</td>
+        <td class="percentage-drop">-</td>
       `;
-      newRow.innerHTML = cellStructure;
-      populateWireSizeDropdowns();
+      populateWireSizeDropdown(newRow.querySelector('.wireSize'));
     }
 
     function deleteLastRow() {
-      const table = document.getElementById('calculationTable').getElementsByTagName('tbody')[0];
-      if (table.rows.length > 0) {
-        table.deleteRow(table.rows.length - 1);
+      const acTableBody = document.getElementById('calculationTable').querySelector('tbody');
+      if (acTableBody.rows.length > 0) {
+        acTableBody.deleteRow(acTableBody.rows.length - 1);
       }
     }
 
-    function exportTableToCSV(filename) {
-      let csv = [];
-      const rows = document.querySelectorAll("#calculationTable tr");
-
-      for (let i = 0; i < rows.length; i++) {
-        const row = [], cols = rows[i].querySelectorAll("td, th");
-        
-        for (let j = 0; j < cols.length; j++) {
-          if (cols[j].querySelector('input')) {
-            const input = cols[j].querySelector('input');
-            row.push('"' + input.value.replace(/"/g, '""') + '"');
-          } else if (cols[j].querySelector('select')) {
-            const select = cols[j].querySelector('select');
-            row.push('"' + select.options[select.selectedIndex].text.replace(/"/g, '""') + '"');
-          } else {
-            row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
-          }
-        }
-        
-        csv.push(row.join(","));
-      }
-
-      downloadCSV(csv.join("\n"), filename);
+    function addDCRow() {
+      const dcTableBody = document.getElementById('dcCalculationTable').querySelector('tbody');
+      const newRow = dcTableBody.insertRow();
+      newRow.innerHTML = `
+        <td><input type="text" placeholder="PV Array Name"></td>
+        <td><input type="number" placeholder="String #"></td>
+        <td><input type="number" step="any" min="0" class="distance" placeholder="D (ft)"></td>
+        <td><input type="number" step="any" min="0" class="current" placeholder="I (A)"></td>
+        <td><input type="number" step="any" min="0" class="moduleVoltage" placeholder="Module/Optimizer Voltage (V)"></td>
+        <td><input type="number" step="any" min="0" class="stringLength" placeholder="String Length"></td>
+        <td><select class="wireSize"></select></td>
+        <td class="string-voltage">-</td>
+        <td class="voltage-drop">-</td>
+        <td class="percentage-drop">-</td>
+      `;
+      populateWireSizeDropdown(newRow.querySelector('.wireSize'));
     }
 
-    function downloadCSV(csv, filename) {
-      const csvFile = new Blob([csv], {type: "text/csv"});
-      const downloadLink = document.createElement("a");
-
-      downloadLink.download = filename;
-      downloadLink.href = window.URL.createObjectURL(csvFile);
-      downloadLink.style.display = "none";
-
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+    function deleteDCLastRow() {
+      const dcTableBody = document.getElementById('dcCalculationTable').querySelector('tbody');
+      if (dcTableBody.rows.length > 0) {
+        dcTableBody.deleteRow(dcTableBody.rows.length - 1);
+      }
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      addRow(); // Add an initial row
+      addACRow();
+      addDCRow();
+    });
+
+    function calculateACVoltageDrop(I, D, wireSize, systemVoltage, phase, K) {
+      let Vd;
+      if (phase === "single") {
+        Vd = (2 * K * I * D) / wireSize;
+      } else {
+        Vd = (1.732 * K * I * D) / wireSize;
+      }
+      return Vd;
+    }
+
+    function updateACVoltageDrop(row) {
+      const current = parseFloat(row.querySelector('.current').value);
+      const distance = parseFloat(row.querySelector('.distance').value);
+      const wireSize = parseFloat(row.querySelector('.wireSize').value);
+      const systemVoltage = parseFloat(row.querySelector('.voltage').value);
+      const phase = row.querySelector('.phase').value;
+      const material = parseFloat(row.querySelector('.material').value);
+      const voltageDrop = calculateACVoltageDrop(current, distance, wireSize, systemVoltage, phase, material);
+      row.querySelector('.voltage-drop').textContent = voltageDrop.toFixed(2);
+      const percentageDrop = (voltageDrop / systemVoltage) * 100;
+      row.querySelector('.percentage-drop').textContent = percentageDrop.toFixed(2);
+    }
+
+    function calculateDCVoltageDrop(I, D, wireSize, stringVoltage, K) {
+      const Vd = (2 * K * I * D) / wireSize;
+      const percentageDrop = (Vd / stringVoltage) * 100;
+      return { Vd, percentageDrop };
+    }
+
+    function updateDCVoltageDrop(row) {
+      const current = parseFloat(row.querySelector('.current').value);
+      const distance = parseFloat(row.querySelector('.distance').value);
+      const wireSize = parseFloat(row.querySelector('.wireSize').value);
+      const moduleVoltage = parseFloat(row.querySelector('.moduleVoltage').value);
+      const stringLength = parseFloat(row.querySelector('.stringLength').value);
+      const stringVoltage = moduleVoltage * stringLength;
+      row.querySelector('.string-voltage').textContent = stringVoltage.toFixed(2) + ' V';
+      const K = 12.9;
+      const { Vd, percentageDrop } = calculateDCVoltageDrop(current, distance, wireSize, stringVoltage, K);
+      row.querySelector('.voltage-drop').textContent = Vd.toFixed(2);
+      row.querySelector('.percentage-drop').textContent = percentageDrop.toFixed(2);
+    }
+
+    function exportTableToCSV(filename, tableSelector) {
+        let csv = [];
+        const rows = document.querySelectorAll(`${tableSelector} tr`);
+
+        for (let i = 0; i < rows.length; i++) {
+            const row = [], cols = rows[i].querySelectorAll("td, th");
+
+            for (let j = 0; j < cols.length; j++) {
+                if (cols[j].querySelector('input, select')) {
+                    // For input or select elements, get the value directly
+                    const input = cols[j].querySelector('input');
+                    const select = cols[j].querySelector('select');
+                    let text = input ? input.value : select ? select.options[select.selectedIndex].text : '';
+                    row.push('"' + text + '"');
+                } else {
+                    // For other types of cells, use the text content
+                    let text = cols[j].innerText.replace(/,/g, ''); // Remove commas to avoid CSV column misalignment
+                    row.push('"' + text + '"');
+                }
+            }
+
+            csv.push(row.join(","));
+        }
+
+        downloadCSV(csv.join("\n"), filename);
+    }
+
+    function downloadCSV(csv, filename) {
+        const csvFile = new Blob([csv], {type: "text/csv"});
+        const downloadLink = document.createElement("a");
+        downloadLink.download = filename;
+        downloadLink.href = window.URL.createObjectURL(csvFile);
+        downloadLink.style.display = "none";
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+    }
+
+    document.getElementById('calculationTable').addEventListener('input', function(event) {
+      const row = event.target.closest('tr');
+      if (row && row.closest('#calculationTable')) {
+        updateACVoltageDrop(row);
+      }
+    });
+
+    document.getElementById('dcCalculationTable').addEventListener('input', function(event) {
+      const row = event.target.closest('tr');
+      if (row && row.closest('#dcCalculationTable')) {
+        updateDCVoltageDrop(row);
+      }
     });
   </script>
 </body>
